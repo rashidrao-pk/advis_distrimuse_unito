@@ -472,6 +472,8 @@ def parse_args():
     p.add_argument("--model_save_interval", default=10,     type=int)
     p.add_argument("--verbose_level",       default=0,      type=int, choices=[0, 1, 2])
     p.add_argument("--save_path_type",      default="cloud", choices=["cloud", "local"])
+    p.add_argument("--checkpoints",         default="scripts/dm_checkpoints/checkpoints", 
+                   choices=["scripts/dm_checkpoints/checkpoints"])
     p.add_argument("--save_figures",        action="store_true", default=False,
                    help="Save reconstruction & tracking figures during training. "
                         "When disabled only loss curves (results/training) and model "
@@ -519,7 +521,7 @@ def train_one_safety_area(safety_area: str, args, device):
 
     # Fixed output dirs used regardless of save_figures flag
     paths.path_training_curves = os.path.join(paths.path_codes_main, "results", "training")
-    paths.path_models          = os.path.join(paths.path_codes_main, "results", "models")
+    paths.path_models      = os.path.join(paths.path_codes_main, args.checkpoints)
     os.makedirs(paths.path_training_curves, exist_ok=True)
     os.makedirs(paths.path_models,          exist_ok=True)
     if args.verbose_level > 0:

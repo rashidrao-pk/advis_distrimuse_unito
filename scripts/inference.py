@@ -749,7 +749,8 @@ def parse_args():
     p.add_argument("--threshold_dir",    default=None,
                    help="Directory containing threshold JSON files "
                         "(default: scripts/results/training/threshold).")
-
+    p.add_argument("--checkpoints",         default="scripts/dm_checkpoints/checkpoints", 
+                   choices=["scripts/dm_checkpoints/checkpoints"])
     # ── Anomaly score params ──────────────────────────────────────────────
     p.add_argument("--offset",   default=1,   type=int)
     p.add_argument("--sigma",    default=1.0, type=float)
@@ -814,7 +815,7 @@ def main():
     paths.path_codes_main  = os.path.join(paths.path_codes, "scripts")
     paths.path_results_cloud = os.path.join(paths.path_codes_cloud, 'scripts/results')
     os.makedirs(paths.path_codes_main, exist_ok=True)
-    paths.path_models      = os.path.join(paths.path_codes_main, "results", "models")
+    paths.path_models      = os.path.join(paths.path_codes_main, args.checkpoints)
 
     # ── Threshold directory ───────────────────────────────────────────────
     if args.threshold_dir is None:

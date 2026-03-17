@@ -38,6 +38,34 @@ Raw Video → Preprocessing → Training → Threshold Calibration → Inference
 
 ---
 
+## ⚙️ 1. Setup
+### 1.1 Create environment
+
+
+```bash
+conda create -n dm_unito python==3.9.18
+conda activate dm_unito
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+
+```
+
+### 1.2 Clone GitHub Repo
+
+```bash
+git clone https://github.com/rashidrao-pk/distrimuse_unito
+conda activate dm_unito
+pip install -r requirments.txt
+```
+
+### 1.3 Retreive Model Checkpoints
+```bash
+cd distrimuse_unito/scripts
+git clone https://gitlab.di.unito.it/rashid/dm_checkpoints
+cd ..
+```
+
+---
+
 ## 1 · Train
 
 Train an autoencoder model on one or all safety areas.
@@ -86,7 +114,8 @@ python scripts/compute_threshold.py --safety_area RoboArm
 # All areas using percentile strategy
 python scripts/compute_threshold.py --safety_area ALL \
     --threshold_strategy percentile \
-    --threshold_percentile 99.5
+    --threshold_percentile 95
+
 
 # Faster computation with larger batches
 python scripts/compute_threshold.py --safety_area ALL --batch_size 64

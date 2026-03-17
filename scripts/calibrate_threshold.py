@@ -205,7 +205,7 @@ def load_model_for_area(area: str, params, paths, args, device):
     history = utmc.load_model(Enc, Dec, Dis, optED, optD,
                                paths, suffix, device=device, verbose=True and args.verbose_level>0)
     if not history:
-        raise RuntimeError(f"No checkpoint for '{area}'. Run train.py first.")
+        raise RuntimeError(f"No checkpoint for '{area} - {args.checkpoints}'. Run train.py first.")
     Enc.eval(); Dec.eval()
     return Enc, Dec, suffix, len(history)
 
@@ -651,7 +651,8 @@ def _setup_params_paths(area: str, args):
     params = utc.get_parameters_by_experiment(params, verbose=False)
     paths.path_codes_cloud = paths.path_codes
     paths.path_codes_main  = os.path.join(paths.path_codes, "scripts")
-    paths.path_models      = os.path.join(paths.path_codes_main, "results", "models")
+    # paths.path_models      = os.path.join(paths.path_codes_main, "results", "models")
+    paths.path_models      = os.path.join(paths.path_codes_main, args.checkpoints)
     paths.path_results_cloud = os.path.join(paths.path_codes_cloud, 'scripts/results')
     os.makedirs(paths.path_codes_main, exist_ok=True)
     os.makedirs(paths.path_models, exist_ok=True)
@@ -739,6 +740,8 @@ def parse_args():
     p.add_argument("--test_dir", default=r'D:\DS\VeleriaLab\V6\fronttop\test_processed\unexpected_person',
                    help="[test mode] Root of labelled test ImageFolder.\n"
                         "May contain per-area sub-dirs or be a flat folder.")
+    p.add_argument("--checkpoints",         default="scripts/dm_checkpoints/checkpoints", 
+                   choices=["scripts/dm_checkpoints/checkpoints"])
     p.add_argument("--gt_csv",   default=None,
                    help="[test mode] Ground-truth CSV with columns:\n"
                         "  frame_no, component, component_anomaly\n"

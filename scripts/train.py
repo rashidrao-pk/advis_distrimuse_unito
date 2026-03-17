@@ -521,7 +521,8 @@ def train_one_safety_area(safety_area: str, args, device):
 
     # Fixed output dirs used regardless of save_figures flag
     paths.path_training_curves = os.path.join(paths.path_codes_main, "results", "training")
-    paths.path_models      = os.path.join(paths.path_codes_main, args.checkpoints)
+    # paths.path_models      = os.path.join(paths.path_codes_main, args.checkpoints)
+    paths.path_models      = os.path.join(os.getcwd(), args.checkpoints)
     os.makedirs(paths.path_training_curves, exist_ok=True)
     os.makedirs(paths.path_models,          exist_ok=True)
     if args.verbose_level > 0:

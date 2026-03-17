@@ -206,9 +206,12 @@ def load_models(safety_areas, params, paths, args, device) -> dict:
         dis = copy.deepcopy(Dis_base)
         optED, optD = utmc.get_optimizers(enc, dec, dis, verbose=False)
 
+        paths.path_models      = os.path.join(os.getcwd(), args.checkpoints)
         history = utmc.load_model(enc, dec, dis, optED, optD,
                                    paths, suffix, device=device, verbose=False)
         if len(history) == 0:
+            if args.verbose_level>0:
+                print('-'*100, f'\nmodel path -- {os.path.exists(paths.path_models)} - {paths.path_models}\n', '-'*100)
             raise RuntimeError(
                 f"No checkpoint found for '{area}' (suffix={suffix}).\n"
                 "Run train.py first."
@@ -815,7 +818,8 @@ def main():
     paths.path_codes_main  = os.path.join(paths.path_codes, "scripts")
     paths.path_results_cloud = os.path.join(paths.path_codes_cloud, 'scripts/results')
     os.makedirs(paths.path_codes_main, exist_ok=True)
-    paths.path_models      = os.path.join(paths.path_codes_main, args.checkpoints)
+    # paths.path_models      = os.path.join(paths.path_codes_main, args.checkpoints)
+    paths.path_models      = os.path.join(os.getcwd(), args.checkpoints)
 
     # ── Threshold directory ───────────────────────────────────────────────
     if args.threshold_dir is None:

@@ -202,9 +202,12 @@ def load_model_for_area(area: str, params, paths, args, device):
         save_path_type=args.save_path_type,
         dir="scripts/results", verbose=False,
     )
+    paths.path_models      = os.path.join(os.getcwd(), args.checkpoints)
     history = utmc.load_model(Enc, Dec, Dis, optED, optD,
                                paths, suffix, device=device, verbose=True and args.verbose_level>0)
     if not history:
+        if args.verbose_level>0:
+            print('-'*100, f'\nmodel path -- {os.path.exists(paths.path_models)} - {paths.path_models}\n', '-'*100)
         raise RuntimeError(f"No checkpoint for '{area} - {args.checkpoints}'. Run train.py first.")
     Enc.eval(); Dec.eval()
     return Enc, Dec, suffix, len(history)
@@ -793,11 +796,12 @@ def main():
             else [args.safety_area]
 
     # Resolve output root once (needs at least one area for the path)
-    _params, _paths = utc.get_params_paths()
-    _paths = utc.get_paths(_paths, verbose=False)
-    _paths.path_codes_main = os.path.join(_paths.path_codes, "scripts")
+    params, paths = utc.get_params_paths()
+    paths = utc.get_paths(paths, verbose=False)
+    paths.path_codes_main = os.path.join(paths.path_codes, "scripts")
+    paths.path_models      = os.path.join(os.getcwd(), args.checkpoints)
     out_dir = args.output_dir or os.path.join(
-        _paths.path_codes_main, "results", "threshold"
+        paths.path_codes_main, "results", "threshold"
     )
     os.makedirs(out_dir, exist_ok=True)
     print(f"[output] {out_dir}")

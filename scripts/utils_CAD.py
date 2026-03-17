@@ -288,10 +288,11 @@ def create_video_from_frames(paths,suffix=None,data_type = 'full',video_for='tra
 def get_paths(paths, verbose=False):
     import platform
     platform_node = platform.node()
+    print(f'system -- OS({os.name}) - user({platform_node})', )
     if os.name=='nt':
-        from matplotlib import rc
-        rc('text',usetex=True)
-        rc('text.latex', preamble='\\usepackage{color}')
+        # from matplotlib import rc
+        # rc('text',usetex=True)
+        # rc('text.latex', preamble='\\usepackage{color}')
         platform_node = platform.node()
         if platform_node=='Rashid-Unito':
             paths.path_results = 'E:/Cloud/RashidPHD/Codes/DistriMuSe/AD_CAD_v3'
@@ -302,16 +303,15 @@ def get_paths(paths, verbose=False):
             paths.path_datasets_main         = 'C:/DS/ValeriaLab'
             paths.path_results_local        = 'C:/rashid_data/codes/DistriMuSe'
     elif os.name=='posix':
-        if  'epito' in platform_node:
+        if 'epito' in platform_node:
             paths.path_results        = '/beegfs/home/mrashid/repos/AD_CAD_v3'
             paths.path_datasets_main  = '/beegfs/home/mrashid/datasets/ValeriaLab'
             paths.path_results_local  = '/beegfs/home/mrashid/repos/AD_CAD_v3'
-        else:
+        if 'distrimuse' in platform_node:
             paths.path_results        = os.getcwd()
-            paths.path_datasets_main  = '/beegfs/home/mrashid/datasets/ValeriaLab'
-            paths.path_results_local  = '/beegfs/home/mrashid/repos/AD_CAD_v3'
+            paths.path_datasets_main  = '/home/unito/data/DS/ValeriaLab'
+            paths.path_results_local  = '/home/unito/data/'
 
-    
     if verbose:
         print('OS type:', os.name)
         print(f'Code Running === {platform.node()} :: Windows')

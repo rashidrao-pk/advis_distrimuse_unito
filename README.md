@@ -57,18 +57,37 @@ conda activate dm_unito
 pip install -r requirments.txt
 ```
 
-### 1.3 Retreive Model Checkpoints
+### 1.3 Retreive Model Checkpoints (Demo 3.2 & Demo 3.3)
+Model Checkpoints are seperately provided and are available at following GitLab repo
+-   [https://GitLab.di.unito.it/rashid/**_`dm_checkpoints_demo32`_**](https://gitlab.di.unito.it/rashid/dm_checkpoints_demo32)
+-   [https://GitLab.di.unito.it/rashid/**_`dm_checkpoints_demo33`_**](https://gitlab.di.unito.it/rashid/dm_checkpoints_demo33)
+
+#### Demo 3.2
+
+Download model checkpoints uploaded on following `GitLab` repo for `Synthetic Palletizing` dataset (dataset provided by `Valeria-Lab, University of Granada`, Spain for `DEMO-3.2` of UC3):
+
 ```bash
 cd distrimuse_unito/scripts
-git clone https://gitlab.di.unito.it/rashid/dm_checkpoints
+git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo32   # FOR Simulated ROBOT Palletizing - DEMO 3.2
+cd ..
+```
+or
+
+#### Demo 3.3
+
+Download Model checkpoints uploaded on following `GitLab` repo for `Real Palletizing` dataset for UC3 ( dataset provided by `Smart Robotics`, Netherlands for `DEMO-3.3` of UC3):
+```bash
+cd distrimuse_unito/scripts
+git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo33 # FOR REAL ROBOT Palletizing - DEMO 3.3
 cd ..
 ```
 
 ---
+---
 
-## 1 · Train
+## 2. Train
 
-Train an autoencoder model on one or all safety areas.
+Train an `VAE-GAN` model on one (`PLeft`, `PRight`, `RoboArm`, `ConvBelt`) or all safety areas.
 
 ```bash
 # Single area (default settings)
@@ -93,6 +112,11 @@ python scripts/train.py --safety_area ALL --epochs 1000 --batch_size 64
 | `--verbose_level` | `int` | `0` | `0` = silent, `1` = standard, `2` = detailed |
 | `--save_figures` | flag | off | Save reconstruction plots, learning curves, and latent space visualisations |
 
+### 2.1 Train with allow/ignore Intermediate Results
+
+This will allow to train VAE-GAN models to allow/ignore intermediate results/figures to store.
+
+
 ```bash
 # Fast mode — saves curves and checkpoints only
 python scripts/train.py --safety_area RoboArm
@@ -103,9 +127,10 @@ python scripts/train.py --safety_area RoboArm --save_figures
 
 ---
 
-## 2 · Compute Threshold
+## 3. Compute/Calibrate Threshold
 
-Estimate per-area anomaly thresholds from reconstruction errors on the validation set.
+### 3.1 Compute Threshold with Validation-set (Subset of Train-set)
+Estimate per-area anomaly `thresholds` from `reconstruction errors` on the `validation` set (ratio used as `80/20`).
 
 ```bash
 # Default (max strategy, offset=1, sigma=1.0)
@@ -123,9 +148,9 @@ python scripts/compute_threshold.py --safety_area ALL --batch_size 64
 
 ---
 
-## 3 · Calibrate Threshold
+### 3.2 Calibrate Threshold with Test-set (Subset of Train-set)
 
-Calibrate thresholds using either unlabelled validation data or a labelled test set.
+Calibrate `thresholds` using labelled test set (containing both `normal` and `anomalous` data).
 
 ```bash
 # Validation mode — no labels required
@@ -136,19 +161,27 @@ python scripts/calibrate_threshold.py --mode test --safety_area ALL \
     --gt_csv scripts/data/annotations/anom_metadata_unexpected_person.csv
 
 # Test mode — tune monitoring metric and search grid
-python scripts/calibrate_threshold.py --mode test --safety_area RoboArm \
-    --gt_csv scripts/data/annotations/anom_metadata.csv \
-    --monitor_score recall \
-    --offset_ls 1,2 \
-    --sigma_ls 1.0,1.5
+python scripts/calibrate_threshold.py --mode test --safety_area RoboArm --gt_csv scripts/data/annotations/anom_metadata_unexpected_person.csv --monitor_score recall --offset_ls 1,2 --sigma_ls 1.0,1.5
 ```
 
 ---
 
 ## 4 · Inference
 
-Run anomaly detection from multiple input sources.
+Run anomaly detection from multiple `input sources` inluding following input sources;
 
+
+### 4.1 Data source options
+
+| `--data_source` | Input | Notes |
+|---|---|---|
+| `preprocessed` | Pre-cropped image folder | Fastest; requires prior preprocessing |
+| `raw` | Raw frame folder | Crops and resizes on the fly |
+| `video` | `.avi` / video file | Supports `--max_frames` limit |
+| `ipcam` | RTSP stream URL | For live camera feeds |
+
+
+### 4.2 Scripts:
 ```bash
 # Pre-cropped frames, evaluate against annotations
 python scripts/inference.py \
@@ -178,14 +211,7 @@ python scripts/inference.py \
     --save_figures
 ```
 
-**Data source options**
 
-| `--data_source` | Input | Notes |
-|---|---|---|
-| `preprocessed` | Pre-cropped image folder | Fastest; requires prior preprocessing |
-| `raw` | Raw frame folder | Crops and resizes on the fly |
-| `video` | `.avi` / video file | Supports `--max_frames` limit |
-| `ipcam` | RTSP stream URL | For live camera feeds |
 
 ---
 

@@ -239,7 +239,7 @@ def _select_threshold_from_scores(scores: np.ndarray, strategy: str,
 def run_val_mode(area: str, args, device, out_dir: str) -> dict:
     """Score val split, derive threshold from score distribution."""
     params, paths = _setup_params_paths(area, args)
-
+    
     split_json = os.path.join(
         paths.train_dir_processed_subgroup,
         f"split_4train_1val_{area}.json"
@@ -482,15 +482,17 @@ def run_test_mode(area: str, args, device, out_dir: str) -> dict:
     """
     # ── Setup ─────────────────────────────────────────────────────────────
     params, paths = _setup_params_paths(area, args)
+    paths.path_models      = os.path.join(os.getcwd(), args.checkpoints)
+
     Enc, Dec, suffix, n_epochs = load_model_for_area(area, params, paths, args, device)
 
     # ── Ground-truth CSV ──────────────────────────────────────────────────
-    if not args.gt_csv or not os.path.exists(args.gt_csv):
+    if not args.gt_csv_path or not os.path.exists(args.gt_csv_path):
         raise FileNotFoundError(
             f"--gt_csv is required for test mode and must exist.\n"
-            f"Given: {args.gt_csv}"
+            f"Given: {args.gt_csv_path}"
         )
-    df_gt    = pd.read_csv(args.gt_csv)
+    df_gt    = pd.read_csv(args.gt_csv_path)
     # Build set of anomalous frame keys for this area
     gt_anom  = df_gt[
         (df_gt["component"] == area) &
@@ -740,12 +742,12 @@ def parse_args():
     p.add_argument("--save_figures", action="store_true", default=False,
                    help="Save per-frame detection PNG figures.")
     # ── Test-mode inputs ──────────────────────────────────────────────────
-    p.add_argument("--test_dir", default=r'D:\DS\VeleriaLab\V6\fronttop\test_processed\unexpected_person',
+    p.add_argument("--test_folder", default=r'V6/fronttop/test_processed/unexpected_person',
                    help="[test mode] Root of labelled test ImageFolder.\n"
                         "May contain per-area sub-dirs or be a flat folder.")
     p.add_argument("--checkpoints",         default="scripts/dm_checkpoints/checkpoints", 
                    choices=["scripts/dm_checkpoints/checkpoints"])
-    p.add_argument("--gt_csv",   default=None,
+    p.add_argument("--gt_csv",   default="scripts/data/annotations/anom_metadata_unexpected_person.csv",
                    help="[test mode] Ground-truth CSV with columns:\n"
                         "  frame_no, component, component_anomaly\n"
                         "  (component_anomaly ∈ {ANOMALOUS, NORMAL})")
@@ -803,6 +805,16 @@ def main():
     out_dir = args.output_dir or os.path.join(
         paths.path_codes_main, "results", "threshold"
     )
+    args.test_dir = os.path.join(paths.path_datasets_main, args.test_folder)
+    args.gt_csv_path = os.path.join(os.getcwd(), args.gt_csv)
+    
+    if args.verbose_level>1:
+        print('-'*100)
+        print(f'PATHS - \npath_datasets_main:{paths.path_datasets_main} \ntest_folder:{args.test_folder} \ntest_dir: {paths.test_dir}')
+        print(f'TEst Folder FILE WILL BE LOADED FROM \t {os.path.exists(args.test_dir)} - {args.test_dir}')
+        print(f'CSV FILE WILL BE LOADED FROM \t{os.path.exists(args.gt_csv_path)} - {args.gt_csv_path}')
+        print('-'*100)
+
     os.makedirs(out_dir, exist_ok=True)
     print(f"[output] {out_dir}")
 

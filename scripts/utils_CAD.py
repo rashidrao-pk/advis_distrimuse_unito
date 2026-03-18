@@ -296,12 +296,12 @@ def get_paths(paths, verbose=False):
         platform_node = platform.node()
         if platform_node=='Rashid-Unito':
             paths.path_results = 'E:/Cloud/RashidPHD/Codes/DistriMuSe/AD_CAD_v3'
-            paths.path_datasets_main        = 'D:/DS/VeleriaLab'
-            paths.path_results_local        = 'E:/PHD/datacloud_data/repos/AD_CAD_v3'
+            paths.path_datasets_main        = r'D:/DS/VeleriaLab/'
+            paths.path_results_local        = r'E:/PHD/datacloud_data/repos/AD_CAD_v3'
         elif platform_node=='DESKTOP-Q14PULG':
-            paths.path_results = 'C:/rashid/RashidPHD/Codes/DistriMuSe/AD_CAD_v3'
-            paths.path_datasets_main         = 'C:/DS/ValeriaLab'
-            paths.path_results_local        = 'C:/rashid_data/codes/DistriMuSe'
+            paths.path_results = r'C:/rashid/RashidPHD/Codes/DistriMuSe/AD_CAD_v3'
+            paths.path_datasets_main         = r'C:/DS/ValeriaLab'
+            paths.path_results_local        = r'C:/rashid_data/codes/DistriMuSe'
     elif os.name=='posix':
         if 'epito' in platform_node:
             paths.path_results        = '/beegfs/home/mrashid/repos/AD_CAD_v3'

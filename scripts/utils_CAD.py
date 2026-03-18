@@ -1,30 +1,57 @@
-import re
-import cv2
+
+# Standard Library
 import os
+import re
+import json
 import platform
-##################################################################################
-import torch
-import matplotlib.pyplot as plt
-import numpy as np
-from torch.autograd import Variable
-from tqdm.auto import tqdm
-global device
-##################################################################################
-from torchvision.utils import make_grid
-from torchvision import datasets
-from torch.utils.data import DataLoader,Dataset
-import torchvision.transforms as transforms
-from PIL import Image
-##################################################################################
-import matplotlib.patches as patches  # Import for adding a rectangle
-##################################################################################
-import utils_model_CAD as utmC
+import random
+from collections import Counter
+from dataclasses import dataclass
 from datetime import datetime
-##################################################################################
+
+# Scientific Computing
+import numpy as np
+from scipy.interpolate import griddata
+
+# Visualization
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.colors import LinearSegmentedColormap, ListedColormap
+from matplotlib.patches import Patch
+from mpl_toolkits.mplot3d import Axes3D
+import plotly.graph_objects as go
+
+# Image Processing
+import cv2
+from PIL import Image, ImageDraw, ImageOps
+from skimage.metrics import structural_similarity as ssim
+from skimage.morphology import dilation, square
+from skimage.segmentation import find_boundaries
+
+# Deep Learning
+import torch
+from torch.autograd import Variable
+from torch.utils.data import DataLoader, Dataset
+from torchvision import datasets
+from torchvision.transforms import functional as TF
+from torchvision.utils import make_grid
+import torchvision.transforms as transforms
+from tqdm.auto import tqdm
+
+# Machine Learning
+from sklearn.decomposition import IncrementalPCA, PCA
+from sklearn.manifold import TSNE
+
+# Local
+import utils_model_CAD as utmC
+
+# Globals
+global device
+
 
 ##################################################################################
 def get_params_paths():
-    from dataclasses import dataclass
+    
 
     @dataclass
     class Parameters:
@@ -323,7 +350,6 @@ def get_paths(paths, verbose=False):
 #################################################################################################
 
 
-from PIL import Image, ImageDraw
 
 class CustomCrop:
     """Custom masking based on subgroup"""
@@ -356,11 +382,7 @@ class CustomCrop:
         return image
 ################################################################################################################################
 ################################################################################################################################
-import os
-from PIL import Image, ImageDraw
-import torchvision.transforms as transforms
-from torchvision import datasets
-from torch.utils.data import DataLoader
+
 
 class LoadMaskedImage:
     """Apply a mask or crop an image based on the selected subgroup and mask type."""
@@ -444,17 +466,7 @@ class LoadMaskedImage:
 ################################################################################################################################
 ### MaskedCrop
 ################################################################################################################################
-import torch
-import cv2
-import torchvision.transforms as transforms
-from torch.utils.data import Dataset, DataLoader
-import matplotlib.pyplot as plt
-import os
-from PIL import Image, ImageOps
-from torchvision.transforms import functional as TF
 
-
-from PIL import Image, ImageDraw
 
 class MaskedCrop:
     """Custom masking based on subgroup"""
@@ -763,8 +775,7 @@ def get_data_loaders(paths,params,#  train_dir,test_dir,
 
 ##################################################################################################
 
-import torchvision.transforms as transforms
-from torchvision import datasets
+
 def get_data_loaders_for_contour(paths,params,#  train_dir,test_dir,
                      root_dir=None,
                      subgroup=None,
@@ -1015,8 +1026,7 @@ class DatasetWithFilename(datasets.ImageFolder):
         filename = os.path.basename(path)
         return img, label, filename
 #########################################################################
-import re  # make sure this is at the top of your module
-# from PIL import Image
+
 def get_test_loaders_from_processed_data_new(
         paths,
         params,
@@ -1409,7 +1419,7 @@ def plot_test_images(test_loader, paths):
     plt.show()
 
 ############################################################################
-from matplotlib.colors import LinearSegmentedColormap
+
 def get_colormap(mode=1):
     if mode==1:
     # TUNED Colormap 
@@ -2095,10 +2105,7 @@ def get_ssim_full_params(win_size_ls = [1, 3],
 ##                     ComputeDifferences            ########
 ##############################################################################################################
 
-import torch
-import numpy as np
-import matplotlib.pyplot as plt
-from skimage.metrics import structural_similarity as ssim
+
 
 class ComputeDifferences():
     def __init__(self, data_batch, recon_batch, AS_SIGMA = 1, AS_OFFSET = 1, AS_QUANT = 1.0):
@@ -2257,107 +2264,6 @@ class ComputeDifferences():
         
         return maps, scores
     ###########################################################################################################
-    # %%cython
-    # import numpy as np
-    # cimport numpy as cnp
-    # from libc.math cimport sqrt, INFINITY
-
-    # def compute_distance_offset(cnp.ndarray[cnp.float32_t, ndim=3] imgA, 
-    #                             cnp.ndarray[cnp.float32_t, ndim=3] imgB, 
-    #                             int offset):
-    #     """Compute minimum Euclidean distance in a search kernel for each pixel."""
-        
-    #     # Assertions to ensure both images have the same shape and type
-    #     assert imgA.shape[0] == imgB.shape[0], "Error: imgA and imgB must have the same height"
-    #     assert imgA.shape[1] == imgB.shape[1], "Error: imgA and imgB must have the same width"
-    #     assert imgA.shape[2] == imgB.shape[2], "Error: imgA and imgB must have the same channels"
-    #     assert imgA.dtype == np.float32 and imgB.dtype == np.float32, "Error: Images must be of type float32"
-        
-    #     cdef int H = imgA.shape[0]
-    #     cdef int W = imgA.shape[1]
-    #     cdef int C = imgA.shape[2]  # Assuming 3 channels (RGB)
-    #     assert C==3, "Error: input images should have three channels"
-        
-    #     cdef cnp.ndarray[cnp.float32_t, ndim=2] distance = np.zeros((H, W), dtype=np.float32)
-
-    #     cdef int i, j, ki, kj
-    #     cdef float min_dist, dist, diff
-
-    #     for i in range(H):
-    #         for j in range(W):
-    #             min_dist = INFINITY  # Initialize with a high value
-                
-    #             # Search in the kernel centered at (i, j) in imgB
-    #             for ki in range(max(0, i - offset), min(H, i + offset + 1)):
-    #                 for kj in range(max(0, j - offset), min(W, j + offset + 1)):
-    #                     dist = 0.0
-    #                     for c in range(C):  # Compute Euclidean distance per channel
-    #                         diff = imgA[i, j, c] - imgB[ki, kj, c]
-    #                         dist += diff * diff
-                        
-    #                     dist = sqrt(dist)  # Take the square root to get the Euclidean distance
-                        
-    #                     if dist < min_dist:
-    #                         min_dist = dist
-                
-    #             distance[i, j] = min_dist  # Assign the minimum distance found
-        
-    #     return distance
-    ###########################################################################################################
-
-
-    # from scipy.ndimage import gaussian_filter
-
-    # def anomaly_score_offset_sigma(self,imgA, imgB, offset, sigma=None, quant=1.0):
-    #     """
-    #     Computes the max anomaly score using compute_distance() with a given offset and optional Gaussian smoothing.
-        
-    #     Parameters:
-    #         imgA (np.ndarray): First image (H, W, 3), float32.
-    #         imgB (np.ndarray): Second image (H, W, 3), float32.
-    #         offset (int): Kernel width for compute_distance().
-    #         sigma (float or None): Standard deviation for Gaussian filter (if None, no filter applied).
-        
-    #     Returns:
-    #         float: Maximum value of the processed distance matrix.
-    #     """
-    #     # Compute distance matrix with given offset
-    #     dist_matrix = compute_distance_offset(imgA, imgB, offset)
-        
-    #     # Apply Gaussian filter if sigma is provided
-    #     if sigma is not None:
-    #         dist_matrix = gaussian_filter(dist_matrix, sigma=sigma)
-        
-    #     # Return max value of the distance matrix, together with the distance matrix
-    #     return np.quantile(dist_matrix, quant), dist_matrix
-    ###########################################################################################################
-    # self.data_batch = data_batch.detach()
-    #     self.recon_batch = recon_batch.detach()
-    #     self.AS_OFFSET = AS_OFFSET
-    #     self.AS_SIGMA  = AS_SIGMA
-    #     self.AS_QUANT  = AS_QUANT 
-    # def get_anomaly_score(self,debug = False):
-
-    #     if debug:
-    #         print('data.shape',self.data_batch.shape)
-    #         print('recons.shape',self.recon_batch.shape)
-            
-    #     assert len(self.data_batch.shape)==4
-    #     assert len(self.recon_batch.shape)==4
-    #     assert (self.data_batch.shape[0]==self.recon_batch.shape[0] and self.data_batch.shape[1]==self.recon_batch.shape[1] and
-    #             self.data_batch.shape[2]==self.recon_batch.shape[2] and self.data_batch.shape[3]==self.recon_batch.shape[3])
-
-    #     scores, diff_images = [], []
-    #     for i in range(self.data_batch.shape[0]):
-    #         data_ = self.data_batch[i].detach().cpu().numpy()
-    #         recons_ = self.recon_batch[i].detach().cpu().numpy()
-    #         data_ =  np.moveaxis(data_, 0, 2)
-    #         recons_ = np.moveaxis(recons_, 0, 2)
-    #         anomaly_score,diff_img = self.anomaly_score_offset_sigma(data_, recons_, self.AS_OFFSET, self.AS_SIGMA, self.AS_QUANT)
-    #         scores.append(anomaly_score)
-    #         diff_images.append(diff_img)
-
-    #     return np.array(scores), np.array(diff_images)
     ###########################################################################################################
     def plot_differences(self, diff_img,diff_scores,type=None,title=None,
                           id=0, cmap='inferno', figsize=(5, 2), sharex=True, sharey=True, title_direct='top'):    
@@ -2518,7 +2424,6 @@ def get_time(suff='',verbose=True):
 ################################################################################################################################################
 ################################################################################################################################################
 
-from sklearn.decomposition import PCA 
 def train_pca_on_latent_space(data=None,n_components=2):
     if data is not None:
         data = data.detach().cpu().numpy()
@@ -2587,108 +2492,8 @@ def get_explore_latent_space(train_loader,Enc,Dec,data_type='full',data_part_typ
 
 #========================================================
 
-
-# from sklearn.decomposition import IncrementalPCA
-# @torch.no_grad()
-# def get_explore_latent_space_batched(
-#     loader,
-#     Enc,
-#     device="cuda",
-#     n_components=2,
-#     ipca_batch_size=4096,
-#     use_autocast=True
-# ):
-#     """
-#     Computes encoder means (mu) over the dataset in batches, fits IncrementalPCA,
-#     and returns 2D embeddings aligned with labels order from the loader.
-
-#     Returns:
-#         z_transformed: (N, n_components) np.ndarray
-#         labels_all:    (N,) np.ndarray or None
-#     """
-#     Enc.eval()
-
-#     # ---------- Pass 1: fit IPCA on mu chunks ----------
-#     ipca = IncrementalPCA(n_components=n_components, batch_size=ipca_batch_size)
-#     have_labels = True
-#     total = 0
-    
-#     for batch in tqdm(loader):
-#         # Unpack common loader shapes
-#         if isinstance(batch, (list, tuple)):
-#             x = batch[0]
-#             y = batch[1] if len(batch) > 1 else None
-#         else:
-#             x = batch
-#             y = None
-
-#         x = x.to(device, non_blocking=True)
-
-#         if use_autocast and torch.cuda.is_available():
-#             with torch.autocast(device_type="cuda", dtype=torch.float16):
-#                 mu, logvar = Enc(x)
-#         else:
-#             mu, logvar = Enc(x)
-
-#         # Flatten mu to (B, D)
-#         mu_flat = mu.detach().float().reshape(mu.size(0), -1).cpu().numpy()
-#         ipca.partial_fit(mu_flat)
-
-#         total += mu.size(0)
-#         if y is None:
-#             have_labels = False
-
-#         del x, mu, logvar
-#         torch.cuda.empty_cache()
-
-#     # ---------- Pass 2: transform each chunk and collect labels ----------
-#     z_list = []
-#     labels_all = [] if have_labels else None
-
-#     for batch in tqdm(loader):
-#         if isinstance(batch, (list, tuple)):
-#             x = batch[0]
-#             y = batch[1] if len(batch) > 1 else None
-#         else:
-#             x = batch
-#             y = None
-
-#         x = x.to(device, non_blocking=True)
-
-#         if use_autocast and torch.cuda.is_available():
-#             with torch.autocast(device_type="cuda", dtype=torch.float16):
-#                 mu, logvar = Enc(x)
-#         else:
-#             mu, logvar = Enc(x)
-
-#         mu_flat = mu.detach().float().reshape(mu.size(0), -1).cpu().numpy()
-#         z_chunk = ipca.transform(mu_flat)
-#         z_list.append(z_chunk)
-
-#         if have_labels:
-#             if torch.is_tensor(y):
-#                 labels_all.append(y.detach().cpu().numpy())
-#             elif isinstance(y, (list, np.ndarray)):
-#                 labels_all.append(np.array(y))
-#             else:
-#                 # fallback: no labels
-#                 have_labels = False
-#                 labels_all = None
-
-#         del x, mu, logvar
-#         torch.cuda.empty_cache()
-
-#     z_transformed = np.concatenate(z_list, axis=0)
-#     if have_labels and labels_all is not None:
-#         labels_all = np.concatenate(labels_all, axis=0)
-
-#     return z_transformed, labels_all
 # #---------------------------------------------------------------------------------------------------
-import numpy as np
-import torch
-from tqdm.auto import tqdm
-from sklearn.decomposition import IncrementalPCA, PCA
-from sklearn.manifold import TSNE
+
 
 
 @torch.no_grad()
@@ -2889,9 +2694,6 @@ def get_explore_latent_space_batched(
 
 #---------------------------------------------------------------------------------------------------
 
-import matplotlib.pyplot as plt
-import numpy as np
-
 def plot_latent(latent_space=None, latent_space_test=None, labels_train=None, labels_test=None, labels=['train','test'],paths=None, normal_class_name='normal', ttl=''):
     classes = np.unique(np.concatenate((labels_train, labels_test)))  # Get all unique classes
     plt.figure(figsize=(8, 6))
@@ -2935,9 +2737,7 @@ def plot_latent(latent_space=None, latent_space_test=None, labels_train=None, la
     del latent_space, latent_space_test
 ################################################################################################################################################
 ################################################################################################################################################
-import matplotlib.pyplot as plt
-import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
+
 
 def plot_latent_3d(latent_space_train=None, 
                    latent_space_test=None, 
@@ -2997,15 +2797,7 @@ def plot_latent_3d(latent_space_train=None,
     ax.legend()
 
     plt.show()
-from scipy.interpolate import griddata
-import matplotlib.pyplot as plt
-import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 
-####################################
-
-import numpy as np
-import plotly.graph_objects as go
 
 def plot_latent_3d_plotly_custom(
         latent_train=None,
@@ -3145,8 +2937,7 @@ def get_anomaly_score_ravi(real_images, reconstructed_images, quantile=1.0):
 ##############################
 # PLOT CONTOUR FROM MASK ON IMAGE
 ########################
-from PIL import Image
-import cv2
+
 def get_contoured_image(image,paths,subgroup,subgroup_mask='mask',mask_image_name = 3015, thickness=2, contour_color=(255, 0, 0), verbose=False):
     # print('TEST ---------> ', params.subgroup)
 
@@ -3285,11 +3076,7 @@ def get_GPU_device(verbose=True):
 ## FUNCTIONS FOR TESTING VIDEO DATASET LOADING
 ########################################################################################################
 ########################################################################################################
-import torch
-import cv2
-import torchvision.transforms as transforms
-from torch.utils.data import Dataset, DataLoader
-import matplotlib.pyplot as plt
+
 class StreamVideoDataset(Dataset):
     def __init__(self, video_path, transform=None):
         self.video_path = video_path
@@ -3355,17 +3142,7 @@ class StreamVideoDataset(Dataset):
 
         return frame,idx
 
-import torch
-import cv2
-import torchvision.transforms as transforms
-from torch.utils.data import Dataset, DataLoader
-import matplotlib.pyplot as plt
-import os
-from PIL import Image, ImageOps
-from torchvision.transforms import functional as TF
 
-
-from PIL import Image, ImageDraw
 ##################################################################################
 ##################################################################################
 ## MaskedCrop --> Custom masking based on subgroup
@@ -3535,10 +3312,7 @@ def plot_anomalymaps(diff_img,component,idx,video_savepath_part,color_score,norm
 #                  destroy_figs = False)
 
 #################################################################################################################################################
-import numpy as np
-import matplotlib.pyplot as plt
-from skimage.segmentation import find_boundaries
-from skimage.morphology import dilation, square
+
 def plot_component_boundary(full_anomaly_map_np,base_mask,norm_score,ax,threshold_cmap, verbose=False):
     boundary_color = 'red' if norm_score > 0.5 else 'black'
     # 2. Overlay the anomaly map with transparency
@@ -3747,15 +3521,6 @@ def f1_score(y_true, y_pred):
         return 0
 
     return 2 * (precision * recall) / (precision + recall)
-
-
-
-
-
-
-
-
-
 ###############################################################################################################################################################
 ###  -----------------------------------------------------------------------------------------------------------------------------------------------------  ###
 ###  SEGMENTATINO RELATED PARTS                                                                                                                             ###
@@ -3899,9 +3664,6 @@ def print_segments_to_bins(rounded_colors,component_to_colormap,colors_count_dic
 # -------------------------------------------------
 # Function --> segments_to_bins
 # -------------------------------------------------
-import matplotlib.pyplot as plt
-import numpy as np
-
 def segments_to_bins(rounded_colors, component_to_colormap, colors_count_dict, verbose=True):
     total_pixels = rounded_colors.shape[0]
     n_components = len(component_to_colormap)
@@ -3942,7 +3704,6 @@ def segments_to_bins(rounded_colors, component_to_colormap, colors_count_dict, v
 # -------------------------------------------------
 def rgb_to_hex(rgb):
     return '{:02X}{:02X}{:02X}'.format(*rgb)
-
 
 # -------------------------------------------------
 # Function --> plot_found_color
@@ -4071,74 +3832,6 @@ def get_combined_mask(image_np,seg_np, paths, mask_image_name=None,disallowed_co
     return component_mask_combined, overlay_image
 
 
-##########################################################################################################
-##########################################################################################################
-#  THRESHOLD COMPUTATTION
-##########################################################################################################
-##########################################################################################################
-# def plot_intermedidate_figs(inpu,recon,diff_img,component,idx,video_savepath_part,
-#                             norm_score,color_score,normscore_text,thres_text,batch_scores,
-#                             destroy_figs = False):
-#     fig, axxes = plt.subplots(1, 3, figsize=(12, 6))
-#     ax1,ax2,ax3 = axxes[0],axxes[1],axxes[2]
-#     ax1.imshow(inpu)
-#     ax1.set_title(f'Frame {idx}')
-#     ax2.imshow((recon* 0.5 + 0.5).squeeze(0).cpu().numpy().transpose(1, 2, 0))
-#     ax2.set_title('Reconstructed')
-    
-
-#     ax3.imshow(diff_img, cmap=threshold_cmap if norm_score<1 else threshold_cmap_unexpected,
-#                 vmin=0, vmax=2*selected_threshold)
-    
-#     # ax3.set_title(f'{component} AM')
-    
-#     # print(component,'[',np.min(comp_map_list[component]),'~',np.max(comp_map_list[component]),']')
-#     ax3.set_title(f"{component} - {thres_text}\nN-Score: {normscore_text}× \n score: {batch_scores:.4f}", 
-#                     color=color_score, 
-#                     fontsize=10)
-#     for ax in axxes:
-#         ax.set_xticks([])
-#         ax.set_yticks([])
-
-#     plt.savefig(f'{video_savepath_part}/{component}_inter_anomaly_map_{idx}.png', dpi=300, bbox_inches='tight')
-#     if destroy_figs:
-#         plt.close(fig)
-#     plt.show()
-
-
-
-##########################################################################################################
-##########################################################################################################
-#  THRESHOLD COMPUTATTION
-##########################################################################################################
-##########################################################################################################
-
-# def plot_anomalymaps(diff_img,component,idx,video_savepath_part,color_score,normscore_text,norm_score,fontsize=10,destroy_figs = False):
-#     fig = plt.figure(figsize=(4, 4))
-
-#     plt.imshow(diff_img, cmap=threshold_cmap if norm_score<1 else threshold_cmap_unexpected, vmin=0, vmax=2*selected_threshold)
-#     plt.title(f"{component} - N-Score: {normscore_text}", 
-#               color=color_score, 
-#               fontsize=fontsize)
-#     plt.xticks([])
-#     plt.yticks([])
-
-#     plt.savefig(f'{video_savepath_part}/{component}_anommap_{idx}.png', dpi=150, bbox_inches='tight')
-#     if destroy_figs:
-#         plt.close(fig)
-#     plt.show()
-
-##########################################################################################################
-##########################################################################################################
-#  TEST TRAINING FOR VAE GAN MODEL
-##########################################################################################################
-##########################################################################################################
-
-import random
-# import numpy as np
-
-# import matplotlib.pyplot as plt
-
 # Function to interpolate between two latent vectors
 def interpolate_vectors(z1, z2, num_steps=10):
     return [z1 * (1 - alpha) + z2 * alpha for alpha in np.linspace(0, 1, num_steps)]
@@ -4196,7 +3889,7 @@ def plot_interpolations(encoder, decoder, train_loader, num_pairs=5, num_steps=1
 
 
 #######################################################################
-from collections import Counter
+
 
 def count_images_per_class(dataset, class_names=None):
     # Many torchvision datasets have 'targets' or 'labels'
@@ -4256,10 +3949,6 @@ def plot_intermedidate_figs(inpu,recon,diff_img,component,idx,video_savepath_par
 
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.colors import ListedColormap
 
 def plot_label_timeline_dual(loader_or_dataset, fps=5, title="Label Timeline (Frames + Time)"):
 
@@ -4355,10 +4044,7 @@ def plot_label_timeline_dual(loader_or_dataset, fps=5, title="Label Timeline (Fr
 
     return gt, frame_indices, times
 #------------------------- PLOTTING ANOMALIES FROM DATA
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.colors import ListedColormap
+
 
 
 def plot_label_timeline_dual_axis(loader_or_dataset, fps=5, title="Anomaly Timeline (Frame + Time)"):
@@ -4455,9 +4141,7 @@ def plot_label_timeline_dual_axis(loader_or_dataset, fps=5, title="Anomaly Timel
 
 
 #--------------------------
-import os
-import json
-import numpy as np
+
 
 
 def get_summary_json_path(path, params, method_name):

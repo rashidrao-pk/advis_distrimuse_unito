@@ -752,8 +752,10 @@ def parse_args():
     p.add_argument("--threshold_dir",    default=None,
                    help="Directory containing threshold JSON files "
                         "(default: scripts/results/training/threshold).")
-    p.add_argument("--checkpoints",         default="scripts/dm_checkpoints/checkpoints", 
-                   choices=["scripts/dm_checkpoints/checkpoints"])
+    p.add_argument("--checkpoints",
+                   default="scripts/dm_checkpoints/checkpoints_32", 
+                   choices=["scripts/dm_checkpoints/checkpoints_32", 
+                            "scripts/dm_checkpoints/checkpoints_33"])
     # ── Anomaly score params ──────────────────────────────────────────────
     p.add_argument("--offset",   default=1,   type=int)
     p.add_argument("--sigma",    default=1.0, type=float)

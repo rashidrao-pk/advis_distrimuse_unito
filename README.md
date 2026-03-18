@@ -68,7 +68,7 @@ Download model checkpoints uploaded on following `GitLab` repo for `Synthetic Pa
 
 ```bash
 cd distrimuse_unito/scripts
-git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo32   # FOR Simulated ROBOT Palletizing - DEMO 3.2
+git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo32 origin-url   # FOR Simulated ROBOT Palletizing - DEMO 3.2
 cd ..
 ```
 or
@@ -78,7 +78,7 @@ or
 Download Model checkpoints uploaded on following `GitLab` repo for `Real Palletizing` dataset for UC3 ( dataset provided by `Smart Robotics`, Netherlands for `DEMO-3.3` of UC3):
 ```bash
 cd distrimuse_unito/scripts
-git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo33 # FOR REAL ROBOT Palletizing - DEMO 3.3
+git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo33 origin-url # FOR REAL ROBOT Palletizing - DEMO 3.3
 cd ..
 ```
 
@@ -92,10 +92,14 @@ Train an `VAE-GAN` model on one (`PLeft`, `PRight`, `RoboArm`, `ConvBelt`) or al
 ```bash
 # Single area (default settings)
 python scripts/train.py --safety_area RoboArm
+```
 
+```bash
 # All areas sequentially
 python scripts/train.py --safety_area ALL
+```
 
+```bash
 # All areas with custom settings
 python scripts/train.py --safety_area ALL --epochs 1000 --batch_size 64
 ```
@@ -120,7 +124,9 @@ This will allow to train VAE-GAN models to allow/ignore intermediate results/fig
 ```bash
 # Fast mode — saves curves and checkpoints only
 python scripts/train.py --safety_area RoboArm
+```
 
+```bash
 # Full mode — also saves reconstruction figures
 python scripts/train.py --safety_area RoboArm --save_figures
 ```
@@ -130,43 +136,31 @@ python scripts/train.py --safety_area RoboArm --save_figures
 ## 3. Compute/Calibrate Threshold
 
 ### 3.1 Compute Threshold with Validation-set (Subset of Train-set)
-Estimate per-area anomaly `thresholds` from `reconstruction errors` on the `validation` set (ratio used as `80/20`).
-
-```bash
-# Default (max strategy, offset=1, sigma=1.0)
-python scripts/compute_threshold.py --safety_area RoboArm
-
-# All areas using percentile strategy
-python scripts/compute_threshold.py --safety_area ALL \
-    --threshold_strategy percentile \
-    --threshold_percentile 95
-
-
-# Faster computation with larger batches
-python scripts/compute_threshold.py --safety_area ALL --batch_size 64
-```
-
----
-
-### 3.2 Calibrate Threshold with Test-set (Subset of Train-set)
-
-Calibrate `thresholds` using labelled test set (containing both `normal` and `anomalous` data).
+- Estimate per-area anomaly `thresholds` from `reconstruction errors` on the `validation` set (ratio used as `80/20`).
 
 ```bash
 # Validation mode — no labels required
 python scripts/calibrate_threshold.py --mode val --safety_area ALL
+```
 
+or 
+### 3.2 Compute Threshold with Test-set
+- Calibrate `thresholds` using labelled test set (containing both `normal` and `anomalous` data).
+
+```bash
 # Test mode — labelled CSV required
 python scripts/calibrate_threshold.py --mode test --safety_area ALL \
     --gt_csv scripts/data/annotations/anom_metadata_unexpected_person.csv
+```
 
+```bash
 # Test mode — tune monitoring metric and search grid
-python scripts/calibrate_threshold.py --mode test --safety_area RoboArm --gt_csv scripts/data/annotations/anom_metadata_unexpected_person.csv --monitor_score recall --offset_ls 1,2 --sigma_ls 1.0,1.5
+python scripts/calibrate_threshold.py --mode test --safety_area RoboArm --gt_csv scripts/data/annotations/anom_metadata_unexpected_person.csv --monitor_score recall --offset_ls 1,2,3 --sigma_ls 0.0,0.5,1.0,1.5
 ```
 
 ---
 
-## 4 · Inference
+## 4. Inference
 
 Run anomaly detection from multiple `input sources` inluding following input sources;
 
@@ -184,25 +178,27 @@ Run anomaly detection from multiple `input sources` inluding following input sou
 ### 4.2 Scripts:
 ```bash
 # Pre-cropped frames, evaluate against annotations
-python scripts/inference.py \
-    --data_source preprocessed \
-    --input_dir /data/test/RoboArm \
-    --safety_area RoboArm \
-    --gt_csv /data/annotations.csv
+python scripts/inference.py --data_source preprocessed --input_dir /home/unito/data/DS/ValeriaLab/V6/fronttop/test_processed/unexpected_person --safety_area RoboArm --gt_csv scripts/data/annotations.csv
+```
 
+```bash
 # Raw video frames, all areas, save output figures
 python scripts/inference.py \
     --data_source raw \
     --input_dir /data/frames \
     --safety_area ALL \
     --save_figures
+```
 
+```bash
 # Video file, process first 500 frames
 python scripts/inference.py \
     --data_source video \
     --input_video /data/test.avi \
     --max_frames 500
+```
 
+```bash
 # Live IP camera stream, all areas
 python scripts/inference.py \
     --data_source ipcam \

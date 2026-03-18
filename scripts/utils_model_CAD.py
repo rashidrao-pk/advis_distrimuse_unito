@@ -1,28 +1,16 @@
+import os
+import pandas as pd
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
-import os
 from torch.autograd import Variable
-import pandas as pd
+import torch.optim as optim
 
 global device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-# Perceptual Loss Module
-class PerceptualLoss(nn.Module):
-    def __init__(self):
-        super(PerceptualLoss, self).__init__()
-        # vgg = models.vgg16(pretrained=True).features
-        vgg = models.vgg16().features
-        self.feature_extractor = nn.Sequential(*list(vgg[:16])).eval()
-        for param in self.feature_extractor.parameters():
-            param.requires_grad = False
-    
-    def forward(self, recon, target):
-        recon_features = self.feature_extractor(recon)
-        target_features = self.feature_extractor(target)
-        return F.mse_loss(recon_features, target_features)
 
 ############################################################################
 ########################################################
@@ -65,11 +53,7 @@ def model_override(model_path, suffix):
 
 
 ########################################################################################################################################################
-# NEW MODELS
-# Encoder
-import torch.nn as nn
-import torch.nn.functional as F
-import torchvision.models as models
+
 # Encoder
 class Encoder(nn.Module):
     def __init__(self, z_size=64):
@@ -148,12 +132,6 @@ class Discriminator(nn.Module):
         x = self.fc_layers(x)
         return x
 
-
-
-
-
-
-
 ########################################################################################################################################################
 def save_model(Enc, Dec, D, optEncDec, optD, paths, loss_history, suffix, verbose = False):
     # last_saved_epoch = epoch  # Track the epoch at which the model was saved
@@ -209,7 +187,7 @@ def get_loss_functions (verbose=True):
         print("Adversarial Loss Function: ", adversarial_loss_fn)
     return reconstruction_loss_fn, adversarial_loss_fn
 ############################################################################
-import torch.optim as optim
+
 
 def get_optimizers (Enc,Dec,Dis,learning_rate_enc_dec=0.001,learning_rate_dis=0.0001, verbose=True):
     optEncDec = optim.Adam(list(Enc.parameters()) + list(Dec.parameters()), lr=learning_rate_enc_dec)

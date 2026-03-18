@@ -472,8 +472,10 @@ def parse_args():
     p.add_argument("--model_save_interval", default=10,     type=int)
     p.add_argument("--verbose_level",       default=0,      type=int, choices=[0, 1, 2])
     p.add_argument("--save_path_type",      default="cloud", choices=["cloud", "local"])
-    p.add_argument("--checkpoints",         default="scripts/dm_checkpoints/checkpoints", 
-                   choices=["scripts/dm_checkpoints/checkpoints"])
+    p.add_argument("--checkpoints",
+                   default="scripts/dm_checkpoints/checkpoints_32", 
+                   choices=["scripts/dm_checkpoints/checkpoints_32", 
+                            "scripts/dm_checkpoints/checkpoints_33"])
     p.add_argument("--save_figures",        action="store_true", default=False,
                    help="Save reconstruction & tracking figures during training. "
                         "When disabled only loss curves (results/training) and model "

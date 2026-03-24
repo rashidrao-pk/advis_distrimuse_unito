@@ -235,3 +235,7 @@ distrimuse_unito/
 ## Acknowledgements
 
 Developed at the **University of Torino** as part of the [**_DistriMuse_**](https://distrimuse.eu/) project on distributed multi-sensor systems for human safety and health.
+
+## Keywords
+
+Anomaly Detection - VAE-GAN - Collaborative Robots

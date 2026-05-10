@@ -276,13 +276,6 @@ distrimuse_unito/
 
 ---
 
-## Publications
-
-### Explainable Anomaly Detection Case Study
-- Muhammad Rashid et al.
-- *ShapBPT in Perspective: A Consolidated Review and an eXplainable Anomaly Detection Case Study*
-- QualITA Workshop @ ICPE 2026
-
 ### Related Research
 - *Can I Trust My Anomaly Detection System? A Case Study Based on Explainable AI*
 - https://arxiv.org/abs/2407.19951

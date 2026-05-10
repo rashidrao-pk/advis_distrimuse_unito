@@ -3,18 +3,72 @@
 > **University of Torino** — Distributed Multi-Sensor Systems for Human Safety and Health
 
 ---
+![Python](https://img.shields.io/badge/Python-3.9-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x-red)
+![CUDA](https://img.shields.io/badge/CUDA-11.8-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Status](https://img.shields.io/badge/Status-Research-orange)
+<a href="https://github.com/rashidrao-pk/advis_distrimuse_unito"><img src="https://img.shields.io/github/repo-size/rashidrao-pk/advis_distrimuse_unito" alt="GitHub repo size"></a>
+<a href="https://github.com/rashidrao-pk/advis_distrimuse_unito/commits/main"><img src="https://img.shields.io/github/commit-activity/t/rashidrao-pk/advis_distrimuse_unito" alt="GitHub commit activity"></a><a href="https://github.com/rashidrao-pk/advis_distrimuse_unito/graphs/contributors"><img src="https://img.shields.io/github/contributors/rashidrao-pk/advis_distrimuse_unito" alt="GitHub contributors"></a>
+<a href="https://github.com/rashidrao-pk/advis_distrimuse_unito/commits/main"><img src="https://img.shields.io/github/last-commit/rashidrao-pk/advis_distrimuse_unito" alt="GitHub last commit"></a>
 
 ## Use Case 3 · Safe Interaction with Robots
 
-An anomaly detection pipeline based on variational autoencoder models that monitors industrial safety areas in real time. The system processes video input, trains per-area models, calibrates detection thresholds, and runs inference on live or recorded footage.
+An industrial anomaly detection framework for collaborative robotic environments using VAE-GAN models. The system monitors predefined safety areas in real time, detects unexpected conditions through reconstruction-based anomaly scoring, and supports training, threshold calibration, and live inference on multiple video sources.
 
 ---
+
+## Key Features
+
+- Real-time anomaly detection for collaborative robotics
+- VAE-GAN based reconstruction learning
+- Per-area safety monitoring
+- Multi-source inference support
+- Threshold calibration framework
+- Support for live camera streams
+- Industrial safety-area preprocessing pipeline
+- Compatible with synthetic and real robotic datasets
+
 
 ## Pipeline Overview
 
 ```
 Raw Video → Preprocessing → Training → Threshold Calibration → Inference
 ```
+
+### Workflow
+<p align="center">
+  <img src="docs/workflow.svg" width="95%"><br>
+  Pipeline for training, calibration, and real-time anomaly detection in collaborative robotic environments.
+</p>
+
+## VAE-GAN Model Architecture
+
+<p align="center">
+    <img src="docs/VAE_GAN_Model.svg" width="95%"><br>
+    VAE-GAN model's architecture.
+</p>
+
+
+
+## Data Preprocessing
+
+<p align="center">
+  <img src="docs/preprocessing.svg" width="95%"><br>
+  Data Preprocessing pipeline.
+</p>
+
+
+
+## Sample Results
+
+<p align="center">
+  <img src="docs/sample_results.svg" width="95%"><br>
+  Sample Results.
+</p>
+
+
+
 
 | Stage | Script | Description |
 |---|---|---|
@@ -36,8 +90,6 @@ Raw Video → Preprocessing → Training → Threshold Calibration → Inference
 | `PRight` | Personnel zone — right |
 | `ALL` | Run all areas sequentially |
 
----
-
 ## ⚙️ 1. Setup
 ### 1.1 Create environment
 
@@ -54,11 +106,11 @@ conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvi
 ```bash
 git clone https://github.com/rashidrao-pk/distrimuse_unito
 conda activate dm_unito
-pip install -r requirments.txt
+pip install -r requirements.txt
 ```
 
-### 1.3 Retreive Model Checkpoints (Demo 3.2 & Demo 3.3)
-Model Checkpoints are seperately provided and are available at following GitLab repo
+### 1.3 Retrieve Model Checkpoints (Demo 3.2 & Demo 3.3)
+Model Checkpoints are separately provided and are available at following GitLab repo
 -   [https://GitLab.di.unito.it/rashid/**_`dm_checkpoints_demo32`_**](https://gitlab.di.unito.it/rashid/dm_checkpoints_demo32)
 -   [https://GitLab.di.unito.it/rashid/**_`dm_checkpoints_demo33`_**](https://gitlab.di.unito.it/rashid/dm_checkpoints_demo33)
 
@@ -71,23 +123,19 @@ cd distrimuse_unito/scripts
 git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo32 origin-url   # FOR Simulated ROBOT Palletizing - DEMO 3.2
 cd ..
 ```
-or
 
-#### Demo 3.3
+> [!NOTE]
+> Model checkpoints are not included in the repository because of file size limitations.
 
-Download Model checkpoints uploaded on following `GitLab` repo for `Real Palletizing` dataset for UC3 ( dataset provided by `Smart Robotics`, Netherlands for `DEMO-3.3` of UC3):
-```bash
-cd distrimuse_unito/scripts
-git clone https://gitlab.di.unito.it/rashid/dm_checkpoints_demo33 origin-url # FOR REAL ROBOT Palletizing - DEMO 3.3
-cd ..
-```
+> [!WARNING]
+> Thresholds are dataset-specific and should be recalibrated for new environments.
 
 ---
 ---
 
 ## 2. Train
 
-Train an `VAE-GAN` model on one (`PLeft`, `PRight`, `RoboArm`, `ConvBelt`) or all safety areas.
+Train a `VAE-GAN` model on one (`PLeft`, `PRight`, `RoboArm`, `ConvBelt`) or all safety areas.
 
 ```bash
 # Single area (default settings)
@@ -133,7 +181,7 @@ python scripts/train.py --safety_area RoboArm --save_figures
 
 ---
 
-## 3. Compute/Calibrate Threshold
+## 3. Threshold Estimation and Calibration
 
 ### 3.1 Compute Threshold with Validation-set (Subset of Train-set)
 - Estimate per-area anomaly `thresholds` from `reconstruction errors` on the `validation` set (ratio used as `80/20`).
@@ -162,7 +210,7 @@ python scripts/calibrate_threshold.py --mode test --safety_area RoboArm --gt_csv
 
 ## 4. Inference
 
-Run anomaly detection from multiple `input sources` inluding following input sources;
+Run anomaly detection from multiple `input sources` including following input sources;
 
 
 ### 4.1 Data source options
@@ -207,30 +255,42 @@ python scripts/inference.py \
     --save_figures
 ```
 
-
-
 ---
 
 ## Repository Structure
 
-```
+```text
 distrimuse_unito/
+├── docs/
 ├── scripts/
 │   ├── train.py
 │   ├── compute_threshold.py
 │   ├── calibrate_threshold.py
 │   ├── inference.py
-│   └── results/                # Figures and threshold files
-│       └── models/             # Saved model weights
-│       └── threshold/          # Saved model weights
-│       └── training/           # Saved Learning Curves
-│   └── data/
-│       └── annotations/
-
-└── README.md
+│   ├── data/
+│   │   └── annotations/
+│   └── results/
+│       ├── models/
+│       ├── thresholds/
+│       └── training/
+├── README.md
+├── CONTRIBUTING.md
+├── LICENSE
+└── requirements.txt
 ```
 
 ---
+
+## Publications
+
+### Explainable Anomaly Detection Case Study
+- Muhammad Rashid et al.
+- *ShapBPT in Perspective: A Consolidated Review and an eXplainable Anomaly Detection Case Study*
+- QualITA Workshop @ ICPE 2026
+
+### Related Research
+- *Can I Trust My Anomaly Detection System? A Case Study Based on Explainable AI*
+- https://arxiv.org/abs/2407.19951
 
 ## Acknowledgements
 
@@ -238,4 +298,4 @@ Developed at the **University of Torino** as part of the [**_DistriMuse_**](http
 
 ## Keywords
 
-Anomaly Detection - VAE-GAN - Collaborative Robots
+Anomaly Detection · VAE-GAN · Explainable AI · Industrial AI · Collaborative Robotics · Computer Vision · Safety Monitoring

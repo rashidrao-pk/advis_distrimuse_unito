@@ -133,7 +133,7 @@ cd ..
 | Synthetic Palletizing | Valeria-Lab, University of Granada | [**Zenodo/Kinematics** dataset](https://zenodo.org/records/18742241?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjczM2FjZDQ5LTY4ODAtNGE2YS05MzQzLTNmMTU5NzY2YzE5MCIsImRhdGEiOnt9LCJyYW5kb20iOiJjNjJmZGY4Y2E0ZWI5MzMwMDI5MzE0NzdlZTcwNTZhMyJ9.9w6dITIp2q681wEH31ZCUg5y5hi3rRy60cHxaLixOm1-5xTIkNjldKMaDvmB8hQRYrHoJ7A_nWNm7fWcTe4KPQ)
 | Real Palletizing | Smart Robotics, Netherlands | -- |
 
- > Tool used to generate Synthetic Dataset by Valeria-LAB is https://github.com/valerialabugr/SimIndus-Dataset
+ > Tool used to generate Synthetic Dataset by Valeria-LAB is available at https://github.com/valerialabugr/SimIndus-Dataset.
 ---
 ---
 

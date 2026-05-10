@@ -110,11 +110,6 @@ pip install -r requirements.txt
 ```
 
 ### 1.3 Retrieve Model Checkpoints (Demo 3.2 & Demo 3.3)
-Model Checkpoints are separately provided and are available at following GitLab repo
--   [https://GitLab.di.unito.it/rashid/**_`dm_checkpoints_demo32`_**](https://gitlab.di.unito.it/rashid/dm_checkpoints_demo32)
--   [https://GitLab.di.unito.it/rashid/**_`dm_checkpoints_demo33`_**](https://gitlab.di.unito.it/rashid/dm_checkpoints_demo33)
-
-#### Demo 3.2
 
 Download model checkpoints uploaded on following `GitLab` repo for `Synthetic Palletizing` dataset (dataset provided by `Valeria-Lab, University of Granada`, Spain for `DEMO-3.2` of UC3):
 

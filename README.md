@@ -109,7 +109,7 @@ conda activate dm_unito
 pip install -r requirements.txt
 ```
 
-### 1.3 Retrieve Model Checkpoints (Demo 3.2 & Demo 3.3)
+### 1.3 Retrieve Model Checkpoints (Demo 3.2)
 
 Download model checkpoints uploaded on following `GitLab` repo for `Synthetic Palletizing` dataset (dataset provided by `Valeria-Lab, University of Granada`, Spain for `DEMO-3.2` of UC3):
 
@@ -125,6 +125,15 @@ cd ..
 > [!WARNING]
 > Thresholds are dataset-specific and should be recalibrated for new environments.
 
+
+## Supported Datasets
+
+| Dataset | Description | LINK |
+|---|---| ---- |
+| Synthetic Palletizing | Valeria-Lab, University of Granada | [**Zenodo/Kinematics** dataset](https://zenodo.org/records/18742241?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjczM2FjZDQ5LTY4ODAtNGE2YS05MzQzLTNmMTU5NzY2YzE5MCIsImRhdGEiOnt9LCJyYW5kb20iOiJjNjJmZGY4Y2E0ZWI5MzMwMDI5MzE0NzdlZTcwNTZhMyJ9.9w6dITIp2q681wEH31ZCUg5y5hi3rRy60cHxaLixOm1-5xTIkNjldKMaDvmB8hQRYrHoJ7A_nWNm7fWcTe4KPQ)
+| Real Palletizing | Smart Robotics, Netherlands | -- |
+
+ > Tool used to generate Synthetic Dataset by Valeria-LAB is https://github.com/valerialabugr/SimIndus-Dataset
 ---
 ---
 

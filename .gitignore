@@ -1,0 +1,35 @@
+# results/.gitignore
+
+# Ignore all files in the results directory
+
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+*.env
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Data and generated outputs
+data/*
+!data/README.md
+
+
+# Large ML files
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+*.npz

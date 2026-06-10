@@ -28,9 +28,10 @@ from PIL import Image
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score, f1_score
 
-import utils_CAD as utc
-import utils_model_CAD as utmc
-from utils_model_CAD import Encoder, Decoder, Discriminator
+from advis import cad_utils as utc
+from advis import models as utmc
+from advis.models import Encoder, Decoder, Discriminator
+from advis.config import load_config, apply_config_defaults
 
 # ---------------------------------------------------------------------------
 # Global stop flag — replaces the ipywidgets checkbox
@@ -453,6 +454,7 @@ ALL_SAFETY_AREAS = ["RoboArm", "ConvBelt", "PLeft", "PRight"]
 
 def parse_args():
     p = argparse.ArgumentParser(description="Train VAE-GAN for CAD anomaly detection")
+    p.add_argument("--config", default="configs/config.yaml", help="Path to ADVIS YAML config file")
     p.add_argument("--safety_area",         default="RoboArm",
                    help="Safety area (subgroup) to train. Pass 'ALL' to train every area sequentially.")
     p.add_argument("--dataset_version",     default="V6",       help="Dataset version tag")
@@ -480,7 +482,11 @@ def parse_args():
                    help="Save reconstruction & tracking figures during training. "
                         "When disabled only loss curves (results/training) and model "
                         "checkpoints (results/models) are written.")
-    return p.parse_args()
+    args = p.parse_args()
+    if args.config:
+        config = load_config(args.config)
+        args = apply_config_defaults(args, config)
+    return args
 
 
 def train_one_safety_area(safety_area: str, args, device):

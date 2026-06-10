@@ -75,9 +75,10 @@ from torchvision import datasets, transforms
 from PIL import Image
 from tqdm import tqdm
 
-import utils_CAD as utc
-import utils_model_CAD as utmc
-from utils_model_CAD import Encoder, Decoder, Discriminator
+from advis import cad_utils as utc
+from advis import models as utmc
+from advis.models import Encoder, Decoder, Discriminator
+from advis.config import load_config, apply_config_defaults
 
 # ---------------------------------------------------------------------------
 # Stop flag
@@ -717,6 +718,7 @@ def parse_args():
         description="Threshold calibration — val mode or supervised test mode.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
+    p.add_argument("--config", default="configs/config.yaml", help="Path to ADVIS YAML config file")
 
     # ── Mode & areas ──────────────────────────────────────────────────────
     p.add_argument("--mode", default="val", choices=["val", "test"],
@@ -784,7 +786,11 @@ def parse_args():
     p.add_argument("--output_dir", default=None,
                    help="Override output dir (default: scripts/results/training/threshold).")
 
-    return p.parse_args()
+    args = p.parse_args()
+    if args.config:
+        config = load_config(args.config)
+        args = apply_config_defaults(args, config)
+    return args
 
 
 # ---------------------------------------------------------------------------

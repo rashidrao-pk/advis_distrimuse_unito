@@ -74,9 +74,10 @@ from sklearn.metrics import (
     recall_score, f1_score, cohen_kappa_score, classification_report
 )
 
-import utils_CAD as utc
-import utils_model_CAD as utmc
-from utils_model_CAD import Encoder, Decoder, Discriminator
+from advis import cad_utils as utc
+from advis import models as utmc
+from advis.models import Encoder, Decoder, Discriminator
+from advis.config import load_config, apply_config_defaults
 
 # ---------------------------------------------------------------------------
 # Global stop flag (Ctrl+C stops cleanly after the current frame)
@@ -716,6 +717,7 @@ def parse_args():
         description="VAE-GAN anomaly detection inference.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
+    p.add_argument("--config", default="configs/config.yaml", help="Path to ADVIS YAML config file")
 
     # ── Data source ───────────────────────────────────────────────────────
     p.add_argument("--data_source", default="preprocessed",
@@ -777,7 +779,11 @@ def parse_args():
                         "(columns: frame_no, component, component_anomaly).\n"
                         "If provided, metrics and confusion matrices are computed.")
 
-    return p.parse_args()
+    args = p.parse_args()
+    if args.config:
+        config = load_config(args.config)
+        args = apply_config_defaults(args, config)
+    return args
 
 
 # ---------------------------------------------------------------------------

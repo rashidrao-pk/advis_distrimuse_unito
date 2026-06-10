@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "advis"
+version = "0.1.0"
+description = "ADVIS_UniGra: VAE-GAN anomaly detection for safe human-robot interaction."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  {name = "Muhammad Rashid"}
+]
+keywords = [
+  "anomaly-detection",
+  "vae-gan",
+  "explainable-ai",
+  "robotics",
+  "industrial-safety",
+  "distrimuse"
+]
+
+dependencies = [
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "scipy",
+  "matplotlib",
+  "opencv-python",
+  "pillow",
+  "pyyaml",
+  "tqdm",
+  "torch",
+  "torchvision"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+  "black"
+]
+
+[project.scripts]
+advis-train = "scripts.train:main"
+advis-calibrate = "scripts.calibrate_threshold:main"
+advis-infer = "scripts.inference:main"
+
+[tool.setuptools]
+packages = ["advis", "scripts"]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100

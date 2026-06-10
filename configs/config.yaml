@@ -1,0 +1,70 @@
+# configs/config.yaml
+
+project:
+  name: ADVIS_UniGra
+  seed: 42
+  device: auto
+
+data:
+  dataset_root: data
+  dataset_version: v4
+  dataset_type: back_view
+  image_size: 128
+  train_folder: train_processed
+  test_folder: test_processed
+  annotation_csv: data/annotations/anom_metadata_unexpected_person.csv
+
+safety_areas:
+  available:
+    - RoboArm
+    - ConvBelt
+    - PLeft
+    - PRight
+  default: RoboArm
+
+preprocessing:
+  crop_coordinates:
+    PLeft: [238, 58, 360, 360]
+    RoboArm: [432, 0, 416, 403]
+    ConvBelt: [495, 240, 300, 480]
+    PRight: [680, 58, 360, 360]
+
+model:
+  name: VAE-GAN
+  latent_dim: 64
+  input_channels: 3
+
+training:
+  epochs: 1000
+  batch_size: 64
+  num_workers: 4
+  pin_memory: true
+  persistent_workers: true
+  augmentation: min
+  learning_rate_enc_dec: 0.001
+  learning_rate_dis: 0.0001
+  val_every: 5
+  val_offset: 4
+  save_figures: false
+
+threshold:
+  mode: val
+  score_method: max
+  percentile: 99.0
+  sigma: 1.0
+  offset: 1
+  monitor_score: binormal_auc
+
+inference:
+  default_data_source: preprocessed
+  threshold_norm_value: 1.0
+  save_figures: false
+  max_frames: null
+
+paths:
+  results_dir: results
+  models_dir: results/models
+  thresholds_dir: results/thresholds
+  training_dir: results/training
+  inference_dir: results/inference
+  logs_dir: results/logs

@@ -21,8 +21,8 @@ We welcome:
 ## 1. Clone Repository
 
 ```bash
-git clone https://github.com/rashidrao-pk/distrimuse_unito
-cd distrimuse_unito
+git clone https://github.com/rashidrao-pk/advis_distrimuse_unito
+cd advis_distrimuse_unito
 ```
 
 ## 2. Create Environment
